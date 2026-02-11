@@ -42,6 +42,37 @@ export const loginUser = async (id: string, password: string): Promise<User | nu
   }
 };
 
+export const registerUser = async (id: string, password: string): Promise<User | null> => {
+  try {
+    const response = await fetch(`${API_Base}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, password })
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Registration failed');
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  } catch (error) {
+    console.error('registerUser error:', error);
+    throw error;
+  }
+};
+
+export const deleteUser = async (id: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_Base}/users/${id}`, {
+      method: 'DELETE',
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('deleteUser error:', error);
+    return false;
+  }
+};
+
 export const updateUser = async (userId: string, updates: Partial<User>): Promise<User | null> => {
   try {
     const response = await fetch(`${API_Base}/users/${userId}`, {

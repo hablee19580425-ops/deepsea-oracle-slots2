@@ -75,6 +75,46 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// Explicit Register (Admin use)
+app.post('/api/users', (req, res) => {
+  const { id, password, role = 'user' } = req.body;
+  if (!id || !password) {
+    return res.status(400).json({ error: "ID and Password required" });
+  }
+
+  const check = "SELECT id FROM users WHERE id = ?";
+  db.get(check, [id], (err, row) => {
+    if (row) return res.status(400).json({ error: "User already exists" });
+
+    const newUser = {
+      id,
+      password,
+      role,
+      credit: 0,
+      totalBet: 0,
+      totalWin: 0
+    };
+    const insert = 'INSERT INTO users (id, password, role, credit, totalBet, totalWin) VALUES (?,?,?,?,?,?)';
+    db.run(insert, Object.values(newUser), function (err) {
+      if (err) return res.status(400).json({ error: err.message });
+      res.status(201).json(newUser);
+    });
+  });
+});
+
+// Delete User
+app.delete('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  if (id === 'OCEAN_MASTER') {
+    return res.status(401).json({ error: "Cannot delete the Ocean Master" });
+  }
+
+  db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
+    if (err) return res.status(400).json({ error: err.message });
+    res.json({ message: "Diver purged from the abyss", id });
+  });
+});
+
 // Update User (Credit, Stats)
 app.patch('/api/users/:id', (req, res) => {
   const { credit, totalBet, totalWin } = req.body;
