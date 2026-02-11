@@ -12,7 +12,7 @@ export const getDeepSeaAdvice = async (credit: number, lastWin: number) => {
     Use oceanic metaphors like currents, trenches, bioluminescence, or sea monsters.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: prompt,
       config: {
         systemInstruction: "You are a mystical deep sea entity. Be concise, atmospheric, and slightly ominous but encouraging.",

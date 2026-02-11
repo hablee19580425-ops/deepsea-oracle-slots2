@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./database.cjs');
 
@@ -8,7 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Get all users (Admin only in real app, but simple here)
 app.get('/api/users', (req, res) => {
@@ -34,7 +34,7 @@ app.get('/api/users/:id', (req, res) => {
       res.status(400).json({ "error": err.message });
       return;
     }
-    res.json(row);
+    res.json(row || null);
   });
 });
 
@@ -103,7 +103,7 @@ app.patch('/api/users/:id', (req, res) => {
     }
     // Return updated user
     db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
-      res.json(row);
+      res.json(row || null);
     });
   });
 });
@@ -115,6 +115,12 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // match one above, send back React's index.html file.
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

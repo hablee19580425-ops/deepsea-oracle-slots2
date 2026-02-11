@@ -6,9 +6,10 @@ export const getUsers = async (): Promise<Record<string, User>> => {
   try {
     const response = await fetch(`${API_Base}/users`);
     if (!response.ok) throw new Error('Failed to fetch users');
-    return await response.json();
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
   } catch (error) {
-    console.error(error);
+    console.error('getUsers error:', error);
     return {};
   }
 };
@@ -17,9 +18,10 @@ export const getUser = async (id: string): Promise<User | null> => {
   try {
     const response = await fetch(`${API_Base}/users/${id}`);
     if (!response.ok) return null;
-    return await response.json();
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
-    console.error(error);
+    console.error('getUser error:', error);
     return null;
   }
 };
@@ -32,9 +34,10 @@ export const loginUser = async (id: string, password: string): Promise<User | nu
       body: JSON.stringify({ id, password })
     });
     if (!response.ok) return null;
-    return await response.json();
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
-    console.error(error);
+    console.error('loginUser error:', error);
     return null;
   }
 };
@@ -47,9 +50,10 @@ export const updateUser = async (userId: string, updates: Partial<User>): Promis
       body: JSON.stringify(updates)
     });
     if (!response.ok) throw new Error('Failed to update user');
-    return await response.json();
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
-    console.error(error);
+    console.error('updateUser error:', error);
     return null;
   }
 };
